@@ -22,6 +22,7 @@ module I18n
         @namespace    = options[:namespace] || 'I18n'
         @pretty_print = !!options[:pretty_print]
         @js_extend    = options.key?(:js_extend) ? !!options[:js_extend] : true
+        @js_module    = options.key?(:js_module) ? !!options[:js_module] : true
         @sort_translation_keys = options.key?(:sort_translation_keys) ? !!options[:sort_translation_keys] : true
       end
 
@@ -53,7 +54,11 @@ module I18n
       end
 
       def js_header
-        %(#{@namespace}.translations || (#{@namespace}.translations = {});\n)
+        if @js_module
+          ''
+        else
+          %(#{@namespace}.translations || (#{@namespace}.translations = {});\n)
+        end
       end
 
       def js_translations(locale, translations)
@@ -63,10 +68,14 @@ module I18n
       end
 
       def js_translations_line(locale, translations)
-        if @js_extend
-          %(#{@namespace}.translations["#{locale}"] = I18n.extend((#{@namespace}.translations["#{locale}"] || {}), #{translations});\n)
+        if @js_module
+          "module.exports = #{translations}"
         else
-          %(#{@namespace}.translations["#{locale}"] = #{translations};\n)
+          if @js_extend
+            %(#{@namespace}.translations["#{locale}"] = I18n.extend((#{@namespace}.translations["#{locale}"] || {}), #{translations});\n)
+          else
+            %(#{@namespace}.translations["#{locale}"] = #{translations};\n)
+          end
         end
       end
 
