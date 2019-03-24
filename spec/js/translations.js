@@ -1,4 +1,3 @@
-var DEBUG = false;
 
 ;(function(){
   var generator = function() {
@@ -58,6 +57,17 @@ var DEBUG = false;
             }
           }
         }
+
+      , arrayWithParams: [
+        null,
+        "An item with a param of {{value}}",
+        "Another item with a param of {{value}}",
+        "A last item with a param of {{value}}",
+        ["An", "array", "of", "strings"],
+        {foo: "bar"}
+      ]
+
+      , null_key: null
     };
 
     Translations["en-US"] = {

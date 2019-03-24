@@ -18,6 +18,12 @@ describe("Translate", function(){
     expect(I18n.t("greetings")).toEqual(I18n.translations.en.greetings);
   });
 
+  it("returns missing message translation for valid scope with null", function(){
+    actual = I18n.t("null_key");
+    expected = '[missing "en.null_key" translation]';
+    expect(actual).toEqual(expected);
+  });
+
   it("returns missing message translation for invalid scope", function(){
     actual = I18n.t("invalid.scope");
     expected = '[missing "en.invalid.scope" translation]';
@@ -184,6 +190,13 @@ describe("Translate", function(){
       actual = I18n.t("foo", options);
       expect(actual).toEqual("FOO");
     })
+
+    it("pluralizes using the correct scope if translation is found within default scope", function() {
+      expect(I18n.translations["en"]["mailbox"]).toEqual(undefined);
+      actual = I18n.t("mailbox.inbox", {count: 1, defaults: [{scope: "inbox"}]});
+      expected = I18n.t("inbox", {count: 1})
+      expect(actual).toEqual(expected)
+    })
   });
 
   it("uses default value for simple translation", function(){
@@ -255,5 +268,17 @@ describe("Translate", function(){
 
   it("accepts the scope as an array using a base scope", function(){
     expect(I18n.t(["stranger"], {scope: "greetings"})).toEqual("Hello stranger!");
+  });
+
+  it("returns an array with values interpolated", function(){
+    var options = {value: 314};
+    expect(I18n.t("arrayWithParams", options)).toEqual([
+      null,
+      "An item with a param of " + options.value,
+      "Another item with a param of " + options.value,
+      "A last item with a param of " + options.value,
+      ["An", "array", "of", "strings"],
+      {foo: "bar"}
+    ]);
   });
 });
