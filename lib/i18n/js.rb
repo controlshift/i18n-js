@@ -208,6 +208,13 @@ module I18n
       end
     end
 
+    def self.js_module
+      config.fetch(:js_module) do
+        # default value
+        false
+      end
+    end
+
     def self.sort_translation_keys?
       @sort_translation_keys ||= (config[:sort_translation_keys]) if config.key?(:sort_translation_keys)
       @sort_translation_keys = true if @sort_translation_keys.nil?
@@ -221,6 +228,7 @@ module I18n
     def self.extract_segment_options(options)
       segment_options = Private::HashWithSymbolKeys.new({
         js_extend: js_extend,
+        js_module: js_module,
         sort_translation_keys: sort_translation_keys?,
         json_only: json_only
       }).freeze
