@@ -5,32 +5,33 @@ module I18n
     module Formatters
       class JS < Base
         def format(translations)
-          contents = header
-          translations.each do |locale, translations_for_locale|
-            contents << line(locale, format_json(translations_for_locale))
+          if @js_module
+            if translations.keys.size == 1  # assumes that in this case we don't want the locale keys
+              locale = translations.keys.first
+              "module.exports = #{format_json(translations[locale])}"
+            else
+              "module.exports = #{format_json(translations)}"
+            end
+          else
+            contents = header
+            translations.each do |locale, translations_for_locale|
+              contents << line(locale, format_json(translations_for_locale))
+            end
+            contents
           end
-          contents
         end
 
         protected
 
         def header
-          if @js_module
-            ''
-          else
-            %(#{@namespace}.translations || (#{@namespace}.translations = {});\n)
-          end
+          %(#{@namespace}.translations || (#{@namespace}.translations = {});\n)
         end
 
         def line(locale, translations)
-          if @js_module
-            "module.exports = #{translations}"
+          if @js_extend
+            %(#{@namespace}.translations["#{locale}"] = I18n.extend((#{@namespace}.translations["#{locale}"] || {}), #{translations});\n)
           else
-            if @js_extend
-              %(#{@namespace}.translations["#{locale}"] = I18n.extend((#{@namespace}.translations["#{locale}"] || {}), #{translations});\n)
-            else
-              %(#{@namespace}.translations["#{locale}"] = #{translations};\n)
-            end
+            %(#{@namespace}.translations["#{locale}"] = #{translations};\n)
           end
         end
       end
